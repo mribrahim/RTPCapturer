@@ -41,26 +41,29 @@ Call::~Call()
 
 void Call::add_RTP(RTPContent rtp, long sec,long usec)
 {
-	numberofframes++;
-
-	if (fark == 0)
-		fark = (usec - tv_usec_start) / 100;
-	else
-		fark = fark + (usec - tv_usec_current)/100;
-
-	tv_sec_current = sec;
-	tv_usec_current = usec;
- 
-
-	// RTP datanin basina header ekle!!!!!!!!!
-	std::string header;
 	std::string strdata = rtp.data;
-	unsigned int leninbytes = strdata.length();
-	unsigned int long timestamp = tv_sec_current - tv_sec_start;
 
-	header = int_to_byte_char(leninbytes, "littleendian") + longint_to_byte_char(fark, "littleendian");
-	strdata = header + strdata;
+	if (payload_type == 96)
+	{
+		numberofframes++;
 
+		if (fark == 0)
+			fark = (usec - tv_usec_start) / 100;
+		else
+			fark = fark + (usec - tv_usec_current) / 100;
+
+		tv_sec_current = sec;
+		tv_usec_current = usec;
+
+
+		// RTP datanin basina header ekle!!!!!!!!!
+		std::string header;
+		unsigned int leninbytes = strdata.length();
+		unsigned int long timestamp = tv_sec_current - tv_sec_start;
+
+		header = int_to_byte_char(leninbytes, "littleendian") + longint_to_byte_char(fark, "littleendian");
+		strdata = header + strdata;
+	}
 
 
 	std::map <unsigned int, std::string>::iterator it;
