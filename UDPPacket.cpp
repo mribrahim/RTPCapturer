@@ -24,7 +24,7 @@ void UDPPacket::Process( long tv_sec, long tv_usec, std::map<std::string, Call> 
 
 
 	// Process RTP packets 
-	if ( payload_type == 96 ) //|| payload_type == 125)
+	if ( payload_type == 96 || payload_type == 8)
 	{
 		//std::cout << " RTP packet-> payload  G.711 " << std::endl;
 		char rtp_markerbit = (udp_data[1] & 128) >> 7;
@@ -207,18 +207,18 @@ void UDPPacket::Process( long tv_sec, long tv_usec, std::map<std::string, Call> 
 		// ilk olarak kaynak ip-porta gore ara
 		it = call_list.find(key);
 		if (it != call_list.end())
-			call_list[key].add_RTP(rtp, tv_sec, tv_usec);
+			call_list[key].add_RTP(rtp);
 		else 
 		{
 			// kaynak ip port icin rtp bulunumazsa hedef ip-port icin ara
 			key = ip_destination + ":" + std::to_string(destination_port);
 			it = call_list.find(key);
 			if (it != call_list.end())
-				call_list[key].add_RTP(rtp, tv_sec, tv_usec);
+				call_list[key].add_RTP(rtp);
 			else
 			{
 				// Create new CALL
-				Call c1(rtp, tv_sec, tv_usec);
+				Call c1(rtp);
 				call_list[key] = c1;
 			}				
 		}

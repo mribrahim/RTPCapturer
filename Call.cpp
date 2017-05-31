@@ -7,7 +7,7 @@ Call::Call()
 	
 }
 
-Call::Call(RTPContent rtp, long sec, long usec)
+Call::Call(RTPContent rtp)
 {
 	// RTP datanin basina header ekle!!!!!!!!!
 	std::string header;
@@ -20,10 +20,10 @@ Call::Call(RTPContent rtp, long sec, long usec)
 
 	ssrc1 = rtp.ssrc;
 	callers_data[rtp.ssrc] = strdata;
-	tv_sec_start = sec;
-	tv_usec_start = usec;
-	tv_sec_current = sec;
-	tv_usec_current = usec;
+	tv_sec_start = rtp.tv_sec;
+	tv_usec_start = rtp.tv_usec;
+	tv_sec_current = rtp.tv_sec;
+	tv_usec_current = rtp.tv_usec;
 
 	ip_source = rtp.ip_source;
 	ip_destination = rtp.ip_destination;
@@ -39,7 +39,7 @@ Call::~Call()
 }
 
 
-void Call::add_RTP(RTPContent rtp, long sec,long usec)
+void Call::add_RTP(RTPContent rtp)
 {
 	std::string strdata = rtp.data;
 
@@ -48,12 +48,12 @@ void Call::add_RTP(RTPContent rtp, long sec,long usec)
 		numberofframes++;
 
 		if (fark == 0)
-			fark = (usec - tv_usec_start) / 100;
+			fark = (rtp.tv_usec - tv_usec_start) / 100;
 		else
-			fark = fark + (usec - tv_usec_current) / 100;
+			fark = fark + (rtp.tv_usec - tv_usec_current) / 100;
 
-		tv_sec_current = sec;
-		tv_usec_current = usec;
+		tv_sec_current = rtp.tv_sec;
+		tv_usec_current = rtp.tv_sec;
 
 
 		// RTP datanin basina header ekle!!!!!!!!!

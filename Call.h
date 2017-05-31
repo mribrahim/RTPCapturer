@@ -12,10 +12,10 @@ class Call
 {
 public:
 	Call();
-	Call(RTPContent,long,long);
+	Call(RTPContent);
 	~Call();
 
-	void add_RTP(RTPContent,long,long);
+	void add_RTP(RTPContent);
 	bool isfinished(long);
 	void save_to_file();
 	void display();
