@@ -134,17 +134,6 @@ void Call::save_to_file()
 		CreateWavefile(filename2 + ".wav", data_decoded_2);
 		std::cout << filename2 << " : " << data_decoded_2.capacity() << std::endl;
 	}
-	else if (payload_type == 31)
-	{
-		std::ofstream out("output1.h261");
-		out << callers_data[ssrc1];
-		out.close();
-
-		std::ofstream out2("output2.h261");
-		out2 << callers_data[ssrc2];
-		out2.close();
-		
-	}
 
 	else if (payload_type == 96)
 	{

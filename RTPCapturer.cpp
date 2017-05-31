@@ -85,62 +85,70 @@ int main(int argc, char **argv)
 	struct pcap_pkthdr *header;
 	const u_char *pcap_data;
 
-	std::string directory = "wav_files";
-	std::string folder = "mkdir " + directory;
-	system(folder.c_str());
-
-	cout<<"\n ************ printing the device list: *************\n";
-	/* The user didn't provide a packet source: Retrieve the local device list */
-	if (pcap_findalldevs(&alldevs, errbuf) == -1)
+	if (argc == 1)
 	{
-		fprintf(stderr, "Error in pcap_findalldevs_ex: %s\n", errbuf);
-		return -1;
-	}
+		std::string directory = "wav_files";
+		std::string folder = "mkdir " + directory;
+		system(folder.c_str());
+
+		cout << "\n ************ printing the device list: *************\n";
+		/* The user didn't provide a packet source: Retrieve the local device list */
+		if (pcap_findalldevs(&alldevs, errbuf) == -1)
+		{
+			fprintf(stderr, "Error in pcap_findalldevs_ex: %s\n", errbuf);
+			return -1;
+		}
 
 		/* Print the list */
-	for (d = alldevs; d; d = d->next)
-	{
-		cout<< ++i << "  " << d->name << ": ";
+		for (d = alldevs; d; d = d->next)
+		{
+			cout << ++i << "  " << d->name << ": ";
 
-		if (d->description)
-			cout<<d->description << endl;
-		else
-			cout<<"No description available" << endl;
+			if (d->description)
+				cout << d->description << endl;
+			else
+				cout << "No description available" << endl;
+		}
+
+		if (i == 0)
+		{
+			fprintf(stderr, "No interfaces found! Exiting.\n");
+			return -1;
+		}
+
+		cout << "Enter the interface number (1-" << i << ")" << endl;
+		cin>>inum;
+
+		if (inum < 1 || inum > i)
+		{
+			printf("\nInterface number out of range.\n");
+
+			/* Free the device list */
+			pcap_freealldevs(alldevs);
+			return -1;
+		}
+
+		/* Jump to the selected adapter */
+		for (d = alldevs, i = 0; i < inum - 1; d = d->next, i++);
+
+		/* Open the device */
+		if ((fp = pcap_open_live(d->name, 100, PCAP_OPENFLAG_PROMISCUOUS, 100, errbuf)) == NULL)
+		{
+			fprintf(stderr, "\nError opening adapter\n");
+			return -1;
+		}
+
+	}
+	else  if (0 == strcmp("-f", argv[1]))
+	{
+		// read from FILE
+		//std::string file = "C:\\Users\\IbrahimD\\Desktop\\vakif_pcap\\vakif1.pcap";
+		//std::string file = "C:\\Users\\IbrahimD\\Desktop\\pcap_goruntulu\\vp8.pcap";
+		std::string file = argv[2];
+		fp = pcap_open_offline(file.c_str(), errbuf);
 	}
 
-	if (i == 0)
-	{
-		fprintf(stderr, "No interfaces found! Exiting.\n");
-		return -1;
-	}
 
-	cout<<"Enter the interface number (1-" <<i << ")" << endl;
-	//cin>>inum;
-	inum = 1;
-
-    if (inum < 1 || inum > i)
-	{
-		printf("\nInterface number out of range.\n");
-
-		/* Free the device list */
-		pcap_freealldevs(alldevs);
-		return -1;
-	}
-
-	/* Jump to the selected adapter */
-	for (d = alldevs, i = 0; i< inum - 1; d = d->next, i++);
-
-	/* Open the device */
-	if (( fp = pcap_open_live(d->name, 100, PCAP_OPENFLAG_PROMISCUOUS, 100, errbuf)) == NULL )
-	{
-		fprintf(stderr, "\nError opening adapter\n");
-		return -1;
-	}
-
-	// read from FILE
-	//std::string file = "C:\\Users\\ibrahim\\Desktop\\vakif_pcap\\vakif1.pcap";
-	std::string file = "C:\\Users\\IbrahimD\\Desktop\\pcap_goruntulu\\vp8.pcap";
-	fp = pcap_open_offline(file.c_str(), errbuf);
 
 
 
