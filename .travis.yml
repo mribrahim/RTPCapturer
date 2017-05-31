@@ -1,0 +1,32 @@
+language: cpp
+
+sudo: required
+
+matrix:
+  include:
+    - os: osx
+      compiler: clang
+      osx_image: xcode6.4
+    - os: osx
+      compiler: clang
+      osx_image: xcode7.3
+    - os: osx
+      compiler: clang
+      osx_image: xcode8
+    - os: osx
+      compiler: clang
+      osx_image: xcode8.1
+    - os: osx
+      compiler: clang
+      osx_image: xcode8.2
+
+addons:
+  apt:
+    packages:
+    - libpcap-dev
+
+before_script:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./configure-mac_os_x.sh      ; fi
+  - make all
+  
+script:
