@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "Call.h"
 
 
@@ -42,6 +42,8 @@ Call::~Call()
 void Call::add_RTP(RTPContent rtp)
 {
 	std::string strdata = rtp.data;
+	tv_sec_current = rtp.tv_sec;
+	tv_usec_current = rtp.tv_sec;
 
 	if (payload_type == 96)
 	{
@@ -51,9 +53,6 @@ void Call::add_RTP(RTPContent rtp)
 			fark = (rtp.tv_usec - tv_usec_start) / 100;
 		else
 			fark = fark + (rtp.tv_usec - tv_usec_current) / 100;
-
-		tv_sec_current = rtp.tv_sec;
-		tv_usec_current = rtp.tv_sec;
 
 
 		// RTP datanin basina header ekle!!!!!!!!!
@@ -149,6 +148,9 @@ void Call::save_to_file()
 		int fark2 = tv_usec_current - tv_usec_start;
 
 		std::string header;
+
+		if (time_elapsed == 0) 
+			return;
 
 		short header_size = 32;  // (6-7) bytes : length of header in bytes -> 32 
 		unsigned int rate = (numberofframes / time_elapsed) ; //  18;

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "UDPPacket.h"
 #include <string> 
 
@@ -24,7 +24,7 @@ void UDPPacket::Process( long tv_sec, long tv_usec, std::map<std::string, Call> 
 
 
 	// Process RTP packets 
-	if ( payload_type == 96 || payload_type == 8)
+	if ( payload_type == 8 && udp_data_length == 172) // || payload_type == 96s)
 	{
 		//std::cout << " RTP packet-> payload  G.711 " << std::endl;
 		char rtp_markerbit = (udp_data[1] & 128) >> 7;

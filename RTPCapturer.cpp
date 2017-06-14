@@ -1,8 +1,6 @@
 // pcapdeneme.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
-
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -176,7 +174,7 @@ int main(int argc, char **argv)
 		//// Show Epoch Time
 		//std::cout << " Epoch Time:   " << header->ts.tv_sec << "." << header->ts.tv_usec << " sn" << std::endl;
 
-		//Check_dated_calls(header->ts.tv_sec,call_list);
+		Check_dated_calls(header->ts.tv_sec,call_list);
 
 		if (header->len == 0)
 			continue;
