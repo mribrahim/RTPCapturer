@@ -27,6 +27,10 @@ private:
 	char payload_type;
 	unsigned int  ssrc1;
 	unsigned int  ssrc2;
+	unsigned int  ssrc1_vp8;
+	unsigned int  ssrc2_vp8;
+
+	void Call::save_VP8(std::string filename,std::string data, unsigned int framecount);
 
 	unsigned int numberofframes;
 	long tv_sec_start;

@@ -17,8 +17,11 @@ Call::Call(RTPContent rtp)
 	header = int_to_byte_char(leninbytes, "littleendian") + longint_to_byte_char(0, "littleendian");
 	strdata = header + strdata;
 
+	if (rtp.payload_type==96)
+		ssrc1_vp8 = rtp.ssrc;
+	else
+		ssrc1 = rtp.ssrc;
 
-	ssrc1 = rtp.ssrc;
 	callers_data[rtp.ssrc] = strdata;
 	tv_sec_start = rtp.tv_sec;
 	tv_usec_start = rtp.tv_usec;
@@ -127,65 +130,66 @@ void Call::save_to_file()
 		std::string filename = temp +  std::to_string(ssrc1);
 
 		CreateWavefile(filename + ".wav", data_decoded_1);
-		std::cout << filename << " : " << data_decoded_1.capacity() << std::endl;
+		std::cout << filename+".wav" << " : " << data_decoded_1.capacity() << std::endl;
 
 		std::string filename2 = temp + std::to_string(ssrc2);
 		CreateWavefile(filename2 + ".wav", data_decoded_2);
-		std::cout << filename2 << " : " << data_decoded_2.capacity() << std::endl;
+		std::cout << filename2+".wav" << " : " << data_decoded_2.capacity() << std::endl;
 	}
 
 	else if (payload_type == 96)
 	{
 		
-		std::string xxxx = ip_source;
-		std::string data = callers_data[ssrc1];
-		
-		
-		// IVF header -> https://wiki.multimedia.cx/index.php/IVF
-		
-		std::string convert = "littleendian";
-		int time_elapsed = tv_sec_current - tv_sec_start;
-		int fark2 = tv_usec_current - tv_usec_start;
+		std::string data = callers_data[ssrc1_vp8];
+		std::string ss = directory + ip_source + " to " + ip_destination + " ";
+		std::string filename = ss + std::to_string(ssrc1_vp8);
 
-		std::string header;
+		save_VP8(filename, data, numberofframes);
 
-		if (time_elapsed == 0) 
-			return;
-
-		short header_size = 32;  // (6-7) bytes : length of header in bytes -> 32 
-		unsigned int rate = (numberofframes / time_elapsed) ; //  18;
-		unsigned int scale = 1;
-
-
-		header = "DKIF" + shortint_to_byte_char(0, convert) + shortint_to_byte_char(header_size, convert) + "VP80";
-		header = header + shortint_to_byte_char(352, convert) + shortint_to_byte_char(288, convert);
-		header = header + int_to_byte_char(rate, convert) + int_to_byte_char(scale, convert);
-		header = header + int_to_byte_char(numberofframes, convert) + int_to_byte_char(0, convert);
-
-		unsigned char* temp = (unsigned char*)header.c_str();
-		unsigned short  lenbyte = char_array_to_short(temp+6,convert);
-		unsigned short width = char_array_to_short(temp + 12, "littleendian");
-	    rate = char_array_to_int(temp + 16, "littleendian");
-		unsigned int framecount = char_array_to_int(temp + 24, "littleendian");
-
-		data = header + data;
-		int length = data.length();
-		char* input = (char*)data.c_str();
-
-		std::fstream fout;
-		fout.open("output1", std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
-		fout.write(input, length);
-		fout.flush();
-		fout.close();
-
-		//std::ofstream out2("output2.vp8");
-		//int length2 = callers_data[ssrc2].data.length();
-		//out2 << callers_data[ssrc2].data;
-		//out2.close();
+		data = callers_data[ssrc2_vp8];
+		filename = ss + std::to_string(ssrc2_vp8);
+		save_VP8(filename, data, numberofframes);
 
 	}
 
 
+}
+
+void Call::save_VP8(std::string filename,std::string data, unsigned int framecount)
+{
+	std::string header;
+	int time_elapsed = tv_sec_current - tv_sec_start;
+	int width = 352;
+	int height = 288; // must be assigned automatically
+
+	if (framecount < 30 || time_elapsed == 0 || data.length()<1000)
+		return;
+
+	filename = filename + ".ivf";
+	short header_size = 32;  // (6-7) bytes : length of header in bytes -> 32 
+	unsigned int rate = (framecount / time_elapsed); //  18;
+	unsigned int scale = 1;
+
+	std::string convert = "littleendian";
+	header = "DKIF" + shortint_to_byte_char(0, convert) + shortint_to_byte_char(header_size, convert) + "VP80";
+	header = header + shortint_to_byte_char(width, convert) + shortint_to_byte_char(height, convert);
+	header = header + int_to_byte_char(rate, convert) + int_to_byte_char(scale, convert);
+	header = header + int_to_byte_char(framecount, convert) + int_to_byte_char(0, convert);
+
+	//unsigned char* temp = (unsigned char*)header.c_str();
+	//unsigned short  lenbyte = char_array_to_short(temp + 6, convert);
+	//unsigned short width = char_array_to_short(temp + 12, "littleendian");
+	//rate = char_array_to_int(temp + 16, "littleendian");
+	//unsigned int framecount = char_array_to_int(temp + 24, "littleendian");
+
+	data = header + data;
+	int length = data.length();
+
+	std::fstream fout;
+	fout.open(filename, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
+	fout.write((char*)data.c_str(), data.length());
+	fout.flush();
+	fout.close();
 }
 
 void Call::display()
