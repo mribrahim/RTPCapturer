@@ -121,20 +121,50 @@ void Call::save_to_file()
 
 	if (payload_type == 8)
 	{
-		std::string str1 = callers_data[ssrc1];
 		data_decoded_1 = decode_data(callers_data[ssrc1]);
 		data_decoded_2 = decode_data(callers_data[ssrc2]);
-		
+
+		unsigned int size1 = data_decoded_1.size();
+		unsigned int size2 = data_decoded_2.size();
+		std::vector<int> toplam;
+
+		if (size1>size2 ) {
+
+			for (size_t i = 0; i < size2; i++)
+			{
+				toplam.push_back(data_decoded_1[i] + data_decoded_2[i]);
+			}
+		}
+		else
+		{
+			for (size_t i = 0; i < size1; i++)
+			{
+				toplam.push_back(data_decoded_1[i] + data_decoded_2[i]);
+			}
+		}
+
+
 		std::string temp = directory + ip_source + " to " + ip_destination + " ";
 
-		std::string filename = temp +  std::to_string(ssrc1);
+		std::string filename = temp + std::to_string(ssrc1);
 
-		CreateWavefile(filename + ".wav", data_decoded_1);
-		std::cout << filename+".wav" << " : " << data_decoded_1.capacity() << std::endl;
+		CreateWavefile(filename + ".wav", toplam);
+		std::cout << filename + ".wav" << " : " << toplam.capacity() << std::endl;
 
-		std::string filename2 = temp + std::to_string(ssrc2);
-		CreateWavefile(filename2 + ".wav", data_decoded_2);
-		std::cout << filename2+".wav" << " : " << data_decoded_2.capacity() << std::endl;
+
+		//data_decoded_1 = decode_data(callers_data[ssrc1]);
+		//data_decoded_2 = decode_data(callers_data[ssrc2]);
+		//
+		//std::string temp = directory + ip_source + " to " + ip_destination + " ";
+
+		//std::string filename = temp +  std::to_string(ssrc1);
+
+		//CreateWavefile(filename + ".wav", data_decoded_1);
+		//std::cout << filename+".wav" << " : " << data_decoded_1.capacity() << std::endl;
+
+		//std::string filename2 = temp + std::to_string(ssrc2);
+		//CreateWavefile(filename2 + ".wav", data_decoded_2);
+		//std::cout << filename2+".wav" << " : " << data_decoded_2.capacity() << std::endl;
 	}
 
 	else if (payload_type == 96)
@@ -194,7 +224,7 @@ void Call::save_VP8(std::string filename,std::string data, unsigned int framecou
 
 void Call::display()
 {
-	std::cout << ip_source << " <--> " << ip_destination << std::endl;
+	std::cout <<"CALL: "<< ip_source << " <--> " << ip_destination << std::endl;
 }
 
 
